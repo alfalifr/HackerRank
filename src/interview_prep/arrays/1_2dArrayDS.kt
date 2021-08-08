@@ -8,7 +8,7 @@ fun main() {
 
   val arr = Array(6) {
     val arr = IO.InterviewPrep.readLine(fileName)!!.trimEnd().split(" ").mapNotNull {
-      println("it= '$it'")
+      //println("it= '$it'")
       if(it.isBlank()) {
         return@mapNotNull null
       }
@@ -29,7 +29,7 @@ fun hourglassSum(arr: Array<Array<Int>>): Int {
       //arrSum[i][u] =
       val arrSum =
         arr[i-1][u-1] +arr[i-1][u] +arr[i-1][u+1] +
-        arr[i][u-1] +arr[i][u] +arr[i][u+1] +
+        arr[i][u] +
         arr[i+1][u-1] +arr[i+1][u] +arr[i+1][u+1]
       if(maxSum < arrSum) {
         maxSum = arrSum
