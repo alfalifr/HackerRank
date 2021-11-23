@@ -3,6 +3,7 @@ package interview_prep
 import kotlin.math.min
 
 fun main() {
+  java.lang.String()
   noPrefix(arrayOf(
     "aab", "defgab", "abcde", "aabcde", "bbbbbbbbbb", "jabjjjad",
   ))
