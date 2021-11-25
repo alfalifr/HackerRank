@@ -2,6 +2,7 @@ package interview_prep
 
 import java.lang.IllegalArgumentException
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 /*
@@ -85,6 +86,33 @@ fun main() {
   println(stdStr(dist3_1))
   println(stdStr(dist3_2))
   println(dist3_3)
+
+
+  val arrHackerRank = arrayOf(
+    arrayOf(2,1),
+    arrayOf(1,4),
+    arrayOf(4,6),
+    arrayOf(3,4),
+    arrayOf(3,6),
+    arrayOf(3,5),
+    arrayOf(2,6),
+    arrayOf(5,2),
+  )
+  val distances = bfs(6, 8, arrHackerRank, 1)
+  println("from hackerrank distances = ${distances.joinToString()}")
+
+  val arrHackerRank2 = arrayOf(
+    arrayOf(1,2),
+    arrayOf(1,3),
+  )
+  val distances2 = bfs(4, 2, arrHackerRank2, 1)
+  println("from hackerrank distances2 = ${distances2.joinToString()}")
+
+  val arrHackerRank3 = arrayOf(
+    arrayOf(2,3),
+  )
+  val distances3 = bfs(3, 1, arrHackerRank3, 2)
+  println("from hackerrank distances3 = ${distances3.joinToString()}")
 }
 
 /*
@@ -189,9 +217,123 @@ data class NodeEdge(
   val distance: Int,
 )
 
+/**
+ * This is fun template from HackerRank
+ *
+ *
+ * Complete the 'bfs' function below.
+ *
+ * The function is expected to return an INTEGER_ARRAY.
+ * The function accepts following parameters:
+ *  1. INTEGER n -> node count
+ *  2. INTEGER m -> edge count
+ *  3. 2D_INTEGER_ARRAY edges -> pair of connected nodes, node number starts from 0 to n (inclusive).
+ *  4. INTEGER s -> start node number
+ */
+//TODO: Still timeout for n= 446 m= 30338 s= 274, n= 224 m= 23724 s= 171
 fun bfs(n: Int, m: Int, edges: Array<Array<Int>>, s: Int): Array<Int> {
   // Write your code here
-  TODO()
+  val buffer = LinkedList<Pair<Int, Int>>()
+  buffer.push(Pair(s, 0/*, s.toString()*/))
+
+  val distances = Array(n-1) { -1 }
+
+  var now: Pair<Int, Int>
+  //var prev: Triple<Int, Int, String>? = null
+  fun distIndex(i: Int) = if(i < s) i-1 else i-2
+
+  val mutEdge = edges.asList().toMutableList()
+  var edgeItr= mutEdge.listIterator()
+
+  val travelledNode = mutableSetOf<Int>()
+  var calculatedDistances = 0
+
+  out@ while(buffer.isNotEmpty()) {
+    now = buffer.pop()
+    travelledNode += now.first
+    //println("now = $now")
+    for(e in edgeItr) {
+      //println("e = ${e.joinToString()}")
+      if(e[0] == now.first || e[1] == now.first) {
+        val node = if(e[0] == now.first) e[1] else e[0]
+        //println("node= $node travelledNode= $travelledNode")
+        //println("buffer = $buffer")
+        //if(node == s) { continue }
+        ///*
+        if(node in travelledNode || buffer.any { it.first == node }) {
+          //edgeItr.remove()
+          continue
+        }
+        // */
+        val travelDistance = Pair(
+          node,
+          now.second + 6
+          //now.third + "-$node",
+        )
+        val dist = distIndex(node)
+        if(distances[dist] == -1 || distances[dist] > travelDistance.second) {
+          if(distances[dist] == -1) {
+            calculatedDistances++
+          } else {
+            edgeItr.remove()
+          }
+          distances[dist] = travelDistance.second
+          //if(travelDistance.second == 6) { break }
+        }
+        if(calculatedDistances == m) {
+          break@out
+        }
+        //println("travelDistance = $travelDistance")
+        buffer.add(travelDistance)
+        //calculatedDistance++
+      }
+    }
+    edgeItr = mutEdge.listIterator()
+  }
+  return distances
+}
+
+/**
+ * Let's assume [edges] is not empty.
+ */
+fun bfsNodeSearch(
+  edgesItr: MutableListIterator<Array<Int>>,
+  sharedBuffer: LinkedList<Pair<Int, Int>>,
+  dest: Int,
+): Int {
+  /*
+  val buffer = LinkedList<Pair<Int, Int>>().apply {
+    push(start to 0)
+  }
+   */
+  println("bfsNodeSearch sharedBuffer= $sharedBuffer")
+  val destDistances = mutableListOf<Pair<Int, Int>>()
+  val travelledNo = mutableSetOf<Int>()
+
+  var now: Pair<Int, Int>
+  while(sharedBuffer.isNotEmpty()) {
+    now = sharedBuffer.pop()
+    travelledNo += now.first
+
+    for(edge in edgesItr) {
+      if(edge[0] == now.first || edge[1] == now.first) {
+        val node = if(edge[0] == now.first) edge[1] else edge[0]
+        println("node= $node now.first= ${now.first} travelledNo= $travelledNo")
+        if(node in travelledNo) {
+          continue
+        }
+        val travelDistance = node to now.second + 6
+        if(node == dest) {
+          destDistances += travelDistance
+        } else {
+          sharedBuffer.push(travelDistance)
+          edgesItr.remove()
+        }
+      }
+    }
+  }
+  return if(destDistances.isEmpty()) -1
+  else destDistances.minByOrNull { it.second }!!.second
 }
 
 
